@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
     StorageEngine& engine = StorageEngine::getInstance();
     engine.createDatabase("company");
     Database db = Database("company");
-    db.createTable("employees", {"id", "name", "salary"}, {INT, TEXT, FLOAT});
+    db.createTable("employees", {"id", "name", "salary"}, {Column::INT, Column::TEXT, Column::FLOAT});
 
 
     return 0;

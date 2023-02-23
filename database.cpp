@@ -147,6 +147,9 @@ public:
     }
 
     ~Table() {
+        for (size_t i = 0; i < numOfColumns; i++) {
+            columns_[i].~Column();
+        }
         std::free(columns_);
     }
 
@@ -169,13 +172,12 @@ private:
 class Database {
 public:
     Database(const std::string& name) : name_(name) {
-        Table tableOfTables("tables", 2);
-        tableOfTables.insertRow({"name", "num_columns"});
+        Table tableOfTables("sys.tables", {"table_name"}, {Column::TEXT});
+        tableOfTables.insertRow({"sys.tables"});
         tables_.insert({"tables", tableOfTables});
 
-        Table tableOfColumns("tables", 3);
-        tableofColumns.insertRow({"table name", "column name", "column type"});
-        tables_.insert("columns", tableOfColumns);
+        Table tableOfColumns("sys.columns", {"column name", "column type", "table name"}, {Column::TEXT, Column::TEXT, Column::TEXT});
+        
 
     }
     
@@ -187,7 +189,7 @@ public:
 
         //Update system tables
         Table& tableOfTables = tables_.at("tables");
-        tableOfTables.insertRow({name, std::to_string(columnNames.size())});
+        tableOfTables.insertRow({name});
 
         Table& tableOfColumns = tables_.at("columns");
         for (size_t i = 0; i < columnNames.size(); i++) {
