@@ -70,9 +70,14 @@ int main(int argc, char* argv[]) {
     cout << Setting::getInstance().getValue("data") << "\n";
 
     StorageEngine& engine = StorageEngine::getInstance();
+    
+    //use singleton
+    //StorageEngine::getInstance().createDatabase("company");
+    
     engine.createDatabase("company");
     Database db = Database("company");
-    db.createTable("employees", {"id", "name", "salary"}, {Column::INT, Column::TEXT, Column::FLOAT});
+    db.createTable("employees", {"id", "name", "salary"}, 
+        {Column::INT, Column::TEXT, Column::FLOAT});
 
 
     return 0;
