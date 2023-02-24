@@ -84,47 +84,47 @@ public:
     }
     };
 
-class DatablockManager {
-    public:
-        static DatablockManager& getInstance() {
-            static DatablockManager instance;
-            return instance;
-        }
+// class DatablockManager {
+//     public:
+//         static DatablockManager& getInstance() {
+//             static DatablockManager instance;
+//             return instance;
+//         }
         
         
-        int *offset;
+//         int *offset;
     
-        // method to allocate new datablock
-        void write(int block_num, const char* data) {
-            //Write Data to the block
-        }
+//         // method to allocate new datablock
+//         void write(int block_num, const char* data) {
+//             //Write Data to the block
+//         }
 
-        //method to read datablock
-        char * read(int id, int* offset) {
-            //read
-            //return the buffer
-            return nullptr;
-        }
+//         //method to read datablock
+//         char * read(int id, int* offset) {
+//             //read
+//             //return the buffer
+//             return nullptr;
+//         }
 
-    private:
-        DatablockManager() {
-            //Constructor Logic
-        }
+//     private:
+//         DatablockManager() {
+//             //Constructor Logic
+//         }
 
-        ~DatablockManager() {
-        // Release any allocated resources
-        }
+//         ~DatablockManager() {
+//         // Release any allocated resources
+//         }
 
 
-        //Disable copy amd move constructor
-        DatablockManager(const DatablockManager&) = delete;
-        DatablockManager(DatablockManager&&) = delete;
+//         //Disable copy amd move constructor
+//         DatablockManager(const DatablockManager&) = delete;
+//         DatablockManager(DatablockManager&&) = delete;
 
-        //Disable copy and move assignment operator
-        DatablockManager& operator=(const DatablockManager&) = delete;
-        DatablockManager& operator=(DatablockManager&&) = delete;
+//         //Disable copy and move assignment operator
+//         DatablockManager& operator=(const DatablockManager&) = delete;
+//         DatablockManager& operator=(DatablockManager&&) = delete;
 
-};
+// };
 
 
 //structure for column Definition:
@@ -221,59 +221,7 @@ public:
 };
 
 
-class Table {
-public:
 
-    Table(std::string name, const std::vector<std::string>& columnNames, const std::vector<Column::Type>& columnTypes) {
-        if (columnTypes.size() != numOfColumns) {
-            throw std::invalid_argument("Incorrect number of column types");
-        }
-
-        if (columnNames.size() != numOfColumns) {
-            throw std::invalid_argument("Incorrect number of column names");
-        }
-
-        columns_ = static_cast<Column*>(malloc(numOfColumns * sizeof(Column)));
-        if (columns_ == nullptr) {
-            throw std::bad_alloc();
-        }
-
-        for (size_t i = 0; i < numOfColumns; i++) {
-            new(&columns_[i]) Column(columnNames[i], columnTypes[i]);
-        }
-    }
-
-    ~Table() {
-        for (size_t i = 0; i < numOfColumns; i++) {
-            columns_[i].~Column();
-        }
-        std::free(columns_);
-    }
-
-    void deleteRow(size_t row) {
-        for (size_t i = 0; i < numOfColumns; i++) {
-            columns_[i].deleteRow(row);
-        }
-    }
-    void getRow(size_t row) {
-        for (size_t i = 0; i < numOfColumns; i++) {
-            columns_[i].getRow(row);
-        }
-    }
-    void insertRow(const std::vector<std::string>& row) {
-        if (row.size() != numOfColumns) {
-            throw std::runtime_error("Invalid row: Number of values does not match number of columns");
-        }
-        for (size_t i = 0; i < numOfColumns; i++) {
-            columns_[i].addValue(row[i]);
-        }
-    }
-    
-private:
-    std::string name_;
-    Column* columns_;
-    size_t numOfColumns;
-};
 
 
 class Database {
