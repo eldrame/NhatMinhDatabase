@@ -123,7 +123,7 @@ public:
         for (int i = 0; i < colDefs.getColumnCount(); i++) {
             if (colDefs.getColumnDef(i).getType() == "int") {
                 int value = std::stoi(values_[i]);
-                std::vector<uint8_t> encodedValue = encodeInt(int value);
+                std::vector<uint8_t> encodedValue = encodeInt((int) value);
                 for (int j = 0; j < sizeof(int); j++) {
                     buffer_[offset + j] = encodedValue[j];
                 }
@@ -131,14 +131,14 @@ public:
             }
             if (colDefs.getColumnDef(i).getType() == "double") {
                 double value = std::stod(values_[i]);
-                std::vector<uint8_t> encodedValue = encodeDouble(double value);
+                std::vector<uint8_t> encodedValue = encodeDouble((double) value);
                 for (int j = 0; j < sizeof(double); j++) {
                     buffer_[offset + j] = encodedValue[j];
                 }
                 offset += colDefs.getColumnDef(i).getWidth();
             }
             if (colDefs.getColumnDef(i).getType() == "string") {
-                std::vector<uint8_t> encodedValue = encodeString(std::string value);
+                std::vector<uint8_t> encodedValue = encodeString((std::string) values_[i]);
                 for (int j = 0; j < encodedValue.size() + 1; j++) {
                     buffer_[offset + j] = encodedValue[j];
                 }
@@ -174,8 +174,8 @@ public:
                     return buffer_;
                 }
                 if (columnDefs.getColumnDef(i).getType() == "string") {
-                    std::vector<uint8_t> encodedValue = encodeString(value);
-                    for (int j = 0; j < value.size() + 1; j++) {
+                    std::vector<uint8_t> encodedValue = encodeString(fieldValue);
+                    for (int j = 0; j < fieldValue.size() + 1; j++) {
                         buffer_[offset + j] = encodedValue[j];
                     }
                     return buffer_;
@@ -192,8 +192,8 @@ public:
     template <typename T>
     T decode(const ColumnDef& colDef) const {
         int offset = 0;
-        for (int i = 0; i < colDefs.size(); i++) {
-            if (colDefs[i].name == colDef.name) {
+        for (int i = 0; i < columnDefs_.getColumnCount(); i++) {
+            if (columnDefs_.getColumnDef(i).name == colDef.getName()) {
                 offset = i * 5 + 1;
                 break;
             }
@@ -202,11 +202,11 @@ public:
         int value = 0;
         double doubleValue = 0;
         std::string strValue = "";
-        if (colDef.type == "int") {
+        if (colDef.getType() == "int") {
             value = (data[offset] << 24) | (data[offset+1] << 16) | (data[offset+2] << 8) | data[offset+3];
             return static_cast<T>(value);
         }
-        else if (colDef.type == "double") {
+        else if (colDef.getType() == "double") {
             uint64_t encodedValue = ((uint64_t)data[offset] << 56) |
                                     ((uint64_t)data[offset+1] << 48) |
                                     ((uint64_t)data[offset+2] << 40) |
@@ -219,7 +219,7 @@ public:
             return static_cast<T>(doubleValue);
         }
 
-        else if (colDef.type == "string") {
+        else if (colDef.getType() == "string") {
             int len = (data[offset] << 8) | data[offset+1];
             strValue.resize(len);
             memcpy(&strValue[0], &data[offset+2], len);
@@ -237,13 +237,14 @@ public:
         encode(fieldName, fieldValue);
     }
 
-    // get aa value of a field from a row
+    // get a value of a field from a row
     template <typename T>
     T getFieldValue(const std::string& fieldName) {
-        for (size_t i = 0; i < columnDefs_.size(); i++) {
-            const ColumnDef& columnDef = columnDefs_.at(i);
+        for (size_t i = 0; i < columnDefs_.getColumnCount(); i++) {
+            const ColumnDef& columnDef = columnDefs_.getColumnDef(i);
             if (columnDef.getName() == fieldName) {
-                const uint8_t* bufferPtr = buffer_[columnDef.getOffset()];
+                int offset = static_cast<int>(columnDef.getWidth());
+                const uint8_t* bufferPtr = buffer_[offset];
                 return decode<T>(bufferPtr, columnDef.getType());
             }
         }
@@ -256,6 +257,7 @@ private:
     char* data;
     int dataSize;
     std::vector<uint8_t> buffer_;
+    ColumnDefs columnDefs_ = table_->getColumnDefs();
 
     // Encode an integer value to a byte array
 std::vector<uint8_t> encodeInt(int value) {
