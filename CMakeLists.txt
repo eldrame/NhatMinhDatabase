@@ -13,16 +13,12 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-enable_testing()
+#include <gtest/gtest.h>
 
-add_executable(
-  hello_test
-  hello_test.cc
-)
-target_link_libraries(
-  hello_test
-  GTest::gtest_main
-)
-
-include(GoogleTest)
-gtest_discover_tests(hello_test)
+// Demonstrate some basic assertions.
+TEST(HelloTest, BasicAssertions) {
+  // Expect two strings not to be equal.
+  EXPECT_STRNE("hello", "world");
+  // Expect equality.
+  EXPECT_EQ(7 * 6, 42);
+}
