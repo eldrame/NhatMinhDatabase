@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <cstdlib>
 
-class DBValue {
+/*class DBValue {
 public:
     enum Type {INT, FLOAT, TEXT};
 
@@ -18,7 +18,7 @@ public:
         char* text;
     } value_;
 
-    //Constructor for int
+    Constructor for int
     DBValue(int value) : type_(INT) {
         value_.integer = value;
     };
@@ -200,8 +200,9 @@ private:
     }
 };
 
-class Row{
+//class Row{
 //a hasmap of column name and value
+/*
 public:
     std::unordered_map<std::string, std::string> row;
     void addValue(const std::string& name, const std::string& value) {
@@ -219,12 +220,13 @@ public:
         row[name] = value;
     }
 };
+*/
 
 
 
 
 
-class Database {
+/*class Database {
 public:
     Database(const std::string& name) : name_(name) {
         // Table tableOfTables("sys.tables", {"table_name"}, {Column::TEXT});
@@ -291,4 +293,5 @@ private:
     StorageEngine() {
         //Constructor logic
     }
-};
+}; */
+

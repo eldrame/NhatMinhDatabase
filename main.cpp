@@ -1,9 +1,12 @@
+#include <stdio.h>
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
 #include <unordered_map>
 #include "database.cpp"
+#include <gtest/gtest.h>
+#include "columndefs.cpp"
 
 using namespace std;
 
@@ -60,37 +63,10 @@ class Application {
 
 
 
-int main(int argc, char* argv[]) {
-    //hello
-
-    Application::getInstance().initialize(argc,argv);
-    Application::getInstance().run();
-    cout << Setting::getInstance().getValue("query") << "\n";
-
-    cout << Setting::getInstance().getValue("data") << "\n";
-
-    StorageEngine& engine = StorageEngine::getInstance();
-    
-    //use singleton
-    //StorageEngine::getInstance().createDatabase("company");
-    
-    engine.createDatabase("company");
-    Database db = Database("company");
-    db.createTable("employees", {"id", "name", "salary"}, 
-        {Column::INT, Column::TEXT, Column::FLOAT});
-
-
-    return 0;
-
-
-
-    //cout << Setting::getInstance().getValue("shit") << "\n";
-    //write an unit test for class Setting
-
-   
+int main(int argc, char **argv) {
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }
-
-//unit Test for class Setting:
 
 
 
