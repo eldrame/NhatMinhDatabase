@@ -46,7 +46,7 @@ public:
         return columns_.size();
     }
 
-    const ColumnDef& getColumnDef(int i) {
+    const ColumnDef& getColumnDef(int i) const {
         if (i < 0 || i >= columns_.size()) {
             throw std::out_of_range("Column index out of range");
         }
@@ -68,14 +68,12 @@ public:
     }
 
     const std::vector<ColumnDef>& getColumns() const {
-        return columns_;
+        return columnDefs_.getColumn();
     }
-
-    
 
     size_t getRowSize() const {
         size_t rowSize_ = 0;
-            for (size_t i = 0; i < columns_.size(); i++) {
+            for (size_t i = 0; i < columnDefs_.getColumnCount(); i++) {
                 const ColumnDef& columnDef = columns_[i];
                 rowSize_ += columnDef.getWidth();
             }
@@ -193,7 +191,7 @@ public:
     T decode(const ColumnDef& colDef) const {
         int offset = 0;
         for (int i = 0; i < columnDefs_.getColumnCount(); i++) {
-            if (columnDefs_.getColumnDef(i).name == colDef.getName()) {
+            if (columnDefs_.getColumnDef(i).getName() == colDef.getName()) {
                 offset = i * 5 + 1;
                 break;
             }
@@ -244,7 +242,7 @@ public:
             const ColumnDef& columnDef = columnDefs_.getColumnDef(i);
             if (columnDef.getName() == fieldName) {
                 int offset = static_cast<int>(columnDef.getWidth());
-                const uint8_t* bufferPtr = buffer_[offset];
+                const uint8_t* bufferPtr = &buffer_[offset];
                 return decode<T>(bufferPtr, columnDef.getType());
             }
         }

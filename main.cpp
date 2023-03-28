@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include "database.cpp"
 #include <gtest/gtest.h>
-#include "columndefs.cpp"
+#include "test.cpp"
 
 using namespace std;
 
