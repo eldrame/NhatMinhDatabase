@@ -9,18 +9,18 @@
 
 class ColumnDef {
 public:
-    ColumnDef(const std::string& name, const std::string& type, int width)
+    ColumnDef(const std::string& name, const std::string& type, const int width)
         : name_(name), type_(type), width_(width) {}
 
-    const std::string& getName() const {
+    std::string& getName() {
         return name_;
     }
 
-    const std::string& getType() const {
+    std::string& getType() {
         return type_;
     }
 
-    int getWidth() const {
+    int getWidth() {
         return width_;
     }
 
@@ -34,19 +34,19 @@ class ColumnDefs {
 public:
     std::vector<ColumnDef> columns_;
 
-    void addColumn(const ColumnDef& column) {
+    void addColumn(ColumnDef column) {
         columns_.push_back(column);
     }
 
-    const std::vector<ColumnDef> getColumn() const {
+    std::vector<ColumnDef> getColumn()  {
         return columns_;
     }
 
-    int getColumnCount() const {
+    int getColumnCount()  {
         return columns_.size();
     }
 
-    const ColumnDef& getColumnDef(int i) const {
+    ColumnDef& getColumnDef(int i) {
         if (i < 0 || i >= columns_.size()) {
             throw std::out_of_range("Column index out of range");
         }
@@ -61,22 +61,22 @@ public:
         columnDefs_ = columnDefs;
     }
 
-    const ColumnDefs getColumnDefs() const {
+    ColumnDefs& getColumnDefs() {
         return columnDefs_;
     }
 
-    const std::string& getName() const {
+    std::string& getName() {
         return name_;
     }
 
-    const std::vector<ColumnDef> getColumns() const {
+    std::vector<ColumnDef> getColumns() {
         return columnDefs_.getColumn();
     }
 
-    size_t getRowSize() const {
+    size_t getRowSize() {
         size_t rowSize_ = 0;
             for (size_t i = 0; i < columnDefs_.getColumnCount(); i++) {
-                const ColumnDef& columnDef = getColumnDefs().getColumnDef(i);
+                ColumnDef columnDef = getColumnDefs().getColumnDef(i);
                 rowSize_ += columnDef.getWidth();
             }
         return rowSize_;
@@ -203,7 +203,7 @@ public:
 
     //decode from byte array to field value in Row
     template <typename T>
-    T decode(const ColumnDef& colDef) const {
+    T decode(ColumnDef& colDef) {
         int offset = 0;
         for (int i = 0; i < columnDefs_.getColumnCount(); i++) {
             if (columnDefs_.getColumnDef(i).getName() == colDef.getName()) {
@@ -254,7 +254,7 @@ public:
     template <typename T>
     T getFieldValue(const std::string& fieldName) {
         for (size_t i = 0; i < columnDefs_.getColumnCount(); i++) {
-            const ColumnDef& columnDef = columnDefs_.getColumnDef(i);
+            ColumnDef& columnDef = columnDefs_.getColumnDef(i);
             if (columnDef.getName() == fieldName) {
                 int offset = static_cast<int>(columnDef.getWidth());
                 const uint8_t* bufferPtr = &buffer_[offset];
