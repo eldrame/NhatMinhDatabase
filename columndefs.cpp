@@ -57,9 +57,11 @@ public:
 
 class Table {
 public:
-    Table(ColumnDefs& columnDefs) : columnDefs_(columnDefs) {}
+    Table(ColumnDefs columnDefs) {
+        columnDefs_ = columnDefs;
+    }
 
-    const ColumnDefs& getColumnDefs() const {
+    const ColumnDefs getColumnDefs() const {
         return columnDefs_;
     }
 
@@ -67,14 +69,14 @@ public:
         return name_;
     }
 
-    const std::vector<ColumnDef>& getColumns() const {
+    const std::vector<ColumnDef> getColumns() const {
         return columnDefs_.getColumn();
     }
 
     size_t getRowSize() const {
         size_t rowSize_ = 0;
             for (size_t i = 0; i < columnDefs_.getColumnCount(); i++) {
-                const ColumnDef& columnDef = columns_[i];
+                const ColumnDef& columnDef = getColumnDefs().getColumnDef(i);
                 rowSize_ += columnDef.getWidth();
             }
         return rowSize_;
@@ -82,7 +84,7 @@ public:
 
 private:
     std::string name_;
-    ColumnDefs& columnDefs_;
+    ColumnDefs columnDefs_;
     std::vector<ColumnDef> columns_ = columnDefs_.columns_;
     std::vector<size_t> columnOffset_;
 };
@@ -92,26 +94,38 @@ public:
     Row(Table* table)
         : table_(table), buffer_(table->getRowSize()) {}
 
-    template <typename T>
-    T getColumnValue(int columnIndex) const {
-        if (columnIndex < 0 || columnIndex >= values_.size()) {
-            // handle index out of range error
-            return T();
-        }
-        return std::any_cast<T>(values_[columnIndex]);
-    }
+    // template <typename T>
+    // // T getColumnValue(int columnIndex) const {
+    // //     if (columnIndex < 0 || columnIndex >= values_.size()) {
+    // //         // handle index out of range error
+    // //         return T();
+    // //     }
+    // //     return std::any_cast<T>(values_[columnIndex]);
+    // // }
 
-    template <typename T>
-    void setColumnValue(int columnIndex, const T& value) {
-        if (columnIndex < 0 || columnIndex >= values_.size()) {
-            // handle index out of range error
-            return;
-        }
-        values_[columnIndex] = value;
-    }
+    // template <typename T>
+    // void setColumnValue(int columnIndex, const T& value) {
+    //     if (columnIndex < 0 || columnIndex >= values_.size()) {
+    //         // handle index out of range error
+    //         return;
+    //     }
+    //     values_[columnIndex] = value;
+    // }
 
     Table* getTable() const {
         return table_;
+    }
+
+    void SetValue(std::vector<std::string> val_Vec) {
+        if (val_Vec.size() == values_.size()) {
+            for (int i = 0; i < values_.size(); i++) {
+                values_[i] = val_Vec[i];
+            }
+        }
+        else {
+            std::cerr << "Error: Input vector has different size than value_ vector" << std::endl;
+            return;
+        }
     }
 
     //encode the Row into the buffer
@@ -143,10 +157,11 @@ public:
                 offset += colDefs.getColumnDef(i).getWidth();
             }
             //case "string" definitely will wrong.
-            return buffer_;
+            
 
             return std::vector<uint8_t>();
         }
+        return buffer_;
     }
 
     //encode from field value in Row to a byte array

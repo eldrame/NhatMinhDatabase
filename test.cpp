@@ -30,14 +30,6 @@ TEST_F(TableTest, TestGetName) {
     EXPECT_EQ(table_->getName(), "");
 }
 
-TEST_F(TableTest, TestGetColumns) {
-    std::vector<ColumnDef> columns = table_->getColumns();
-    EXPECT_EQ(columns.size(), 3);
-    EXPECT_EQ(columns[0].getName(), "id");
-    EXPECT_EQ(columns[1].getName(), "name");
-    EXPECT_EQ(columns[2].getName(), "age");
-}
-
 TEST_F(TableTest, TestGetColumnDefs) {
     ColumnDefs columnDefs = table_->getColumnDefs();
     EXPECT_EQ(columnDefs.getColumnCount(), 3);
@@ -49,3 +41,44 @@ TEST_F(TableTest, TestGetColumnDefs) {
 TEST_F(TableTest, TestGetRowSize) {
     EXPECT_EQ(table_->getRowSize(), sizeof(int) + 10 + sizeof(int));
 }
+
+
+TEST_F(TableTest, TestGetColumns) {
+
+    //std::vector<ColumnDef> columns = table_->getColumns();
+    
+    EXPECT_EQ(table_->getColumns().size(), 3);
+    EXPECT_EQ(table_->getColumns()[0].getName(), "id");
+    EXPECT_EQ(table_->getColumns()[1].getName(), "name");
+
+    EXPECT_EQ(table_->getColumns()[2].getName(), "age");
+
+}
+
+
+class RowTest : public ::testing::Test {
+protected:
+    void SetUp() override {
+        // Create a ColumnDefs object, a Table object, a Row object to test the row buffer:
+        ColumnDefs columnDefs;
+        columnDefs.addColumn(ColumnDef("id", "int", sizeof(int)));
+        columnDefs.addColumn(ColumnDef("name", "string", 10));
+        columnDefs.addColumn(ColumnDef("age", "int", sizeof(int)));
+        table_ = new Table(columnDefs);
+        row_ = new Row(table_);
+        row_->SetValue({"7", "Phan Nhat Minh", "18"});
+        std::vector<uint8_t> buffer = row_->encodeRow();
+    }
+
+    void TearDown() override {
+        delete table_;
+        delete row_;
+    }
+
+    Table* table_;
+    Row* row_;
+};
+
+
+
+
