@@ -8,6 +8,10 @@
 
 #include "columndefs.cpp"
 
+TEST(Rowtest, stoi) {
+    EXPECT_EQ(std::stoi("8"), 8);
+}
+
 class TableTest : public ::testing::Test {
 protected:
     void SetUp() override {
@@ -67,7 +71,6 @@ protected:
         table_ = new Table(columnDefs);
         row_ = new Row(table_);
         row_->SetValue({"7", "Phan Nhat Minh", "18"});
-        std::vector<uint8_t> buffer = row_->encodeRow();
     }
 
     void TearDown() override {
@@ -78,6 +81,14 @@ protected:
     Table* table_;
     Row* row_;
 };
+
+TEST_F(RowTest, TestencodeRow) {
+    EXPECT_EQ(row_->encodeRow()[0], 0);
+}
+
+
+
+
 
 
 

@@ -92,7 +92,7 @@ private:
 class Row {
 public:
     Row(Table* table)
-        : table_(table), buffer_(table->getRowSize()) {}
+        : table_(table), buffer_(table->getRowSize()), values_(table->getColumnDefs().getColumnCount()) {}
 
     // template <typename T>
     // // T getColumnValue(int columnIndex) const {
@@ -159,7 +159,7 @@ public:
             //case "string" definitely will wrong.
             
 
-            return std::vector<uint8_t>();
+            
         }
         return buffer_;
     }
