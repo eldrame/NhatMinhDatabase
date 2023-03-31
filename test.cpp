@@ -83,7 +83,25 @@ protected:
 };
 
 TEST_F(RowTest, TestencodeRow) {
-    EXPECT_EQ(row_->encodeRow()[0], 0);
+    EXPECT_EQ(row_->encodeRow()[0], '\a');
+    EXPECT_EQ(row_->encodeRow()[1], '\0');
+    EXPECT_EQ(row_->encodeRow()[2], '\0');
+    EXPECT_EQ(row_->encodeRow()[3], '\0');
+    EXPECT_EQ(row_->encodeRow()[4], 'P');
+    EXPECT_EQ(row_->encodeRow()[5], 'h');
+    EXPECT_EQ(row_->encodeRow()[6], 'a');
+    EXPECT_EQ(row_->encodeRow()[7], 'n');
+    EXPECT_EQ(row_->encodeRow()[8], ' ');
+    EXPECT_EQ(row_->encodeRow()[9], 'N');
+    EXPECT_EQ(row_->encodeRow()[10], 'h');
+    EXPECT_EQ(row_->encodeRow()[11], 'a');
+    EXPECT_EQ(row_->encodeRow()[12], 't');
+    EXPECT_EQ(row_->encodeRow()[13], ' ');
+    EXPECT_EQ(row_->encodeRow()[14], '\x12');
+    EXPECT_EQ(row_->encodeRow()[15], '\0');
+    EXPECT_EQ(row_->encodeRow()[16], '\0');
+    EXPECT_EQ(row_->encodeRow()[17], '\0');
+
 }
 
 
