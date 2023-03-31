@@ -21,7 +21,15 @@ public:
     }
 
     int getWidth() {
-        return width_;
+        if (getType() == "int") {
+            return sizeof(int);
+        }
+        if (getType() == "double") {
+            return sizeof(double);
+        }
+        if (getType() == "string") {
+            return 30;
+        }
     }
 
 private:
@@ -132,6 +140,9 @@ public:
     std::vector<uint8_t> encodeRow() {
         ColumnDefs colDefs = getTable()-> getColumnDefs();
         int offset = 0;
+        for (int i =0; i < getTable()->getRowSize(); i++) {
+            buffer_[offset + i] = 0;
+        }
         for (int i = 0; i < colDefs.getColumnCount(); i++) {
             if (colDefs.getColumnDef(i).getType() == "int") {
                 int value = std::stoi(values_[i]);
@@ -188,6 +199,9 @@ public:
                 }
                 if (columnDefs.getColumnDef(i).getType() == "string") {
                     std::vector<uint8_t> encodedValue = encodeString(fieldValue);
+                    for (int t = 0; t < 30; t++) {
+                        buffer_[offset + t] = 0;
+                    }
                     for (int j = 0; j < fieldValue.size() + 1; j++) {
                         buffer_[offset + j] = encodedValue[j];
                     }

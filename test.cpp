@@ -43,7 +43,7 @@ TEST_F(TableTest, TestGetColumnDefs) {
 }
 
 TEST_F(TableTest, TestGetRowSize) {
-    EXPECT_EQ(table_->getRowSize(), sizeof(int) + 10 + sizeof(int));
+    EXPECT_EQ(table_->getRowSize(), sizeof(int) + 30 + sizeof(int));
 }
 
 
@@ -97,11 +97,18 @@ TEST_F(RowTest, TestencodeRow) {
     EXPECT_EQ(row_->encodeRow()[11], 'a');
     EXPECT_EQ(row_->encodeRow()[12], 't');
     EXPECT_EQ(row_->encodeRow()[13], ' ');
-    EXPECT_EQ(row_->encodeRow()[14], '\x12');
-    EXPECT_EQ(row_->encodeRow()[15], '\0');
-    EXPECT_EQ(row_->encodeRow()[16], '\0');
-    EXPECT_EQ(row_->encodeRow()[17], '\0');
-
+    EXPECT_EQ(row_->encodeRow()[14], 'M');
+    EXPECT_EQ(row_->encodeRow()[15], 'i');
+    EXPECT_EQ(row_->encodeRow()[16], 'n');
+    EXPECT_EQ(row_->encodeRow()[17], 'h');
+    EXPECT_EQ(row_->encodeRow()[18], '\0');
+    EXPECT_EQ(row_->encodeRow()[19], '\0');
+    EXPECT_EQ(row_->encodeRow()[20], '\0');
+    EXPECT_EQ(row_->encodeRow()[33], '\0');
+    EXPECT_EQ(row_->encodeRow()[34], '\x12');
+    EXPECT_EQ(row_->encodeRow()[35], '\0');
+    EXPECT_EQ(row_->encodeRow()[36], '\0');
+    EXPECT_EQ(row_->encodeRow()[37], '\0');
 }
 
 
