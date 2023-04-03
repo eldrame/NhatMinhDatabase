@@ -61,6 +61,15 @@ public:
         }
         return columns_[i];
     }
+
+    size_t getRowSize() {
+        size_t rowSize_ = 0;
+            for (size_t i = 0; i < getColumnCount(); i++) {
+                ColumnDef columnDef = getColumnDef(i);
+                rowSize_ += columnDef.getWidth();
+            }
+        return rowSize_;
+    }
 };
 
 
@@ -80,15 +89,6 @@ public:
 
     std::vector<ColumnDef> getColumns() {
         return columnDefs_.getColumn();
-    }
-
-    size_t getRowSize() {
-        size_t rowSize_ = 0;
-            for (size_t i = 0; i < columnDefs_.getColumnCount(); i++) {
-                ColumnDef columnDef = getColumnDefs().getColumnDef(i);
-                rowSize_ += columnDef.getWidth();
-            }
-        return rowSize_;
     }
 
     Segment* createSegment() {
@@ -111,8 +111,8 @@ private:
 
 class Row {
 public:
-    Row(Table* table)
-        : table_(table), buffer_(table->getRowSize()), values_(table->getColumnDefs().getColumnCount()) {}
+    Row(ColumnDefs columnDefs)
+        : columnDefs_(columnDefs), buffer_(columnDefs.getRowSize()), values_(columnDefs.getColumnCount()) {}
 
     // template <typename T>
     // // T getColumnValue(int columnIndex) const {
@@ -132,8 +132,8 @@ public:
     //     values_[columnIndex] = value;
     // }
 
-    Table* getTable() const {
-        return table_;
+    ColumnDefs getColumnDefs() const {
+        return columnDefs_;
     }
 
     void SetValue(std::vector<std::string> val_Vec) {
@@ -150,9 +150,9 @@ public:
 
     //encode the Row into the buffer
     std::vector<uint8_t> encodeRow() {
-        ColumnDefs colDefs = getTable()-> getColumnDefs();
+        ColumnDefs colDefs = getColumnDefs();
         int offset = 0;
-        for (int i =0; i < getTable()->getRowSize(); i++) {
+        for (int i = 0; i < getColumnDefs().getRowSize(); i++) {
             buffer_[offset + i] = 0;
         }
         for (int i = 0; i < colDefs.getColumnCount(); i++) {
@@ -179,7 +179,6 @@ public:
                 }
                 offset += colDefs.getColumnDef(i).getWidth();
             }
-            //case "string" definitely will wrong.
             
 
             
@@ -189,11 +188,11 @@ public:
 
     //encode from field value in Row to a byte array
     std::vector<uint8_t> encode(std::string columnName, std::string fieldValue) {
-        ColumnDefs columnDefs = table_->getColumnDefs();
+        ColumnDefs colDefs = getColumnDefs();
         int offset = 0;
-        for (int i = 0; i < columnDefs.getColumnCount(); i++) {
-            if (columnDefs.getColumnDef(i).getName() == columnName) {
-                if (columnDefs.getColumnDef(i).getType() == "int") {
+        for (int i = 0; i < colDefs.getColumnCount(); i++) {
+            if (colDefs.getColumnDef(i).getName() == columnName) {
+                if (colDefs.getColumnDef(i).getType() == "int") {
                     int value = std::stoi(fieldValue);
                     std::vector<uint8_t> encodedValue = encodeInt(value);
                     for (int i = 0; i < sizeof(int); i++) {
@@ -201,7 +200,7 @@ public:
                     }
                     return buffer_;
                 }
-                if (columnDefs.getColumnDef(i).getType() == "double") {
+                if (colDefs.getColumnDef(i).getType() == "double") {
                     double value = std::stod(fieldValue);
                     std::vector<uint8_t> encodedValue = encodeDouble(value);
                     for (int i = 0; i < sizeof(double); i++) {
@@ -209,7 +208,7 @@ public:
                     }
                     return buffer_;
                 }
-                if (columnDefs.getColumnDef(i).getType() == "string") {
+                if (colDefs.getColumnDef(i).getType() == "string") {
                     std::vector<uint8_t> encodedValue = encodeString(fieldValue);
                     for (int t = 0; t < 30; t++) {
                         buffer_[offset + t] = 0;
@@ -222,7 +221,7 @@ public:
                 
             }
             else {
-                offset += columnDefs.getColumnDef(i).getWidth();
+                offset += colDefs.getColumnDef(i).getWidth();
             }
         }
     }
@@ -290,14 +289,16 @@ public:
         throw std::runtime_error("Field" + fieldName + "not found in row");
     }
 
+    //pass the buffer to Segment
+    
+
+
 private:
-    Table* table_;
+    ColumnDefs columnDefs_;
     std::vector<std::string> values_;
     char* data;
     int dataSize;
     std::vector<uint8_t> buffer_;
-    ColumnDefs columnDefs_ = table_->getColumnDefs();
-    Segment* segment_ = getTable()->createSegment();
 
     // Encode an integer value to a byte array
 std::vector<uint8_t> encodeInt(int value) {
@@ -329,4 +330,8 @@ std::vector<uint8_t> encodeString(const std::string& value) {
     return buffer;
 }
 };
+
+
+
+
 

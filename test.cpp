@@ -43,7 +43,8 @@ TEST_F(TableTest, TestGetColumnDefs) {
 }
 
 TEST_F(TableTest, TestGetRowSize) {
-    EXPECT_EQ(table_->getRowSize(), sizeof(int) + 30 + sizeof(int));
+    ColumnDefs columnDefs = table_->getColumnDefs();
+    EXPECT_EQ(columnDefs.getRowSize(), sizeof(int) + 30 + sizeof(int));
 }
 
 
@@ -64,20 +65,20 @@ class RowTest : public ::testing::Test {
 protected:
     void SetUp() override {
         // Create a ColumnDefs object, a Table object, a Row object to test the row buffer:
-        ColumnDefs columnDefs;
+        
         columnDefs.addColumn(ColumnDef("id", "int", sizeof(int)));
         columnDefs.addColumn(ColumnDef("name", "string", 10));
         columnDefs.addColumn(ColumnDef("age", "int", sizeof(int)));
-        table_ = new Table(columnDefs);
-        row_ = new Row(table_);
+        row_ = new Row(columnDefs);
         row_->SetValue({"7", "Phan Nhat Minh", "18"});
     }
 
     void TearDown() override {
-        delete table_;
+        //delete table_;
         delete row_;
     }
-
+    
+    ColumnDefs columnDefs;
     Table* table_;
     Row* row_;
 };
@@ -102,7 +103,7 @@ TEST_F(RowTest, TestencodeRow) {
     EXPECT_EQ(row_->encodeRow()[16], 'n');
     EXPECT_EQ(row_->encodeRow()[17], 'h');
     EXPECT_EQ(row_->encodeRow()[18], '\0');
-    EXPECT_EQ(row_->encodeRow()[19], ' ');
+    EXPECT_EQ(row_->encodeRow()[19], '\0');
     EXPECT_EQ(row_->encodeRow()[20], '\0');
     EXPECT_EQ(row_->encodeRow()[33], '\0');
     EXPECT_EQ(row_->encodeRow()[34], '\x12');

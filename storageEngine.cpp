@@ -13,6 +13,7 @@ class Extent {
 
 class Segment {
 public:
+
     void Write(std::vector<uint8_t> newData) {
         byteBuffer_ = newData;
     }
