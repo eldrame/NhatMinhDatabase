@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstring>
 #include <stdio.h>
+#include "storageEngine.cpp"
 
 
 
@@ -90,11 +91,22 @@ public:
         return rowSize_;
     }
 
+    Segment* createSegment() {
+        if (segmentPtr != nullptr) {
+            return nullptr;
+        }
+        else {
+            segmentPtr = new Segment();
+            return segmentPtr;
+        }
+    }
+
 private:
     std::string name_;
     ColumnDefs columnDefs_;
     std::vector<ColumnDef> columns_ = columnDefs_.columns_;
     std::vector<size_t> columnOffset_;
+    Segment* segmentPtr;
 };
 
 class Row {
@@ -285,6 +297,7 @@ private:
     int dataSize;
     std::vector<uint8_t> buffer_;
     ColumnDefs columnDefs_ = table_->getColumnDefs();
+    Segment* segment_ = getTable()->createSegment();
 
     // Encode an integer value to a byte array
 std::vector<uint8_t> encodeInt(int value) {

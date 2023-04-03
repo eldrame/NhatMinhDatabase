@@ -102,7 +102,7 @@ TEST_F(RowTest, TestencodeRow) {
     EXPECT_EQ(row_->encodeRow()[16], 'n');
     EXPECT_EQ(row_->encodeRow()[17], 'h');
     EXPECT_EQ(row_->encodeRow()[18], '\0');
-    EXPECT_EQ(row_->encodeRow()[19], '\0');
+    EXPECT_EQ(row_->encodeRow()[19], ' ');
     EXPECT_EQ(row_->encodeRow()[20], '\0');
     EXPECT_EQ(row_->encodeRow()[33], '\0');
     EXPECT_EQ(row_->encodeRow()[34], '\x12');
