@@ -77,46 +77,11 @@ public:
 };
 
 
-class Table {
-public:
-    Table(ColumnDefs columnDefs) {
-        columnDefs_ = columnDefs;
-    }
-
-    ColumnDefs& getColumnDefs() {
-        return columnDefs_;
-    }
-
-    std::string& getName() {
-        return name_;
-    }
-
-    std::vector<ColumnDef> getColumns() {
-        return columnDefs_.getColumn();
-    }
-
-    Segment* createSegment() {
-        if (segmentPtr != nullptr) {
-            return nullptr;
-        }
-        else {
-            segmentPtr = new Segment();
-            return segmentPtr;
-        }
-    }
-
-private:
-    std::string name_;
-    ColumnDefs columnDefs_;
-    std::vector<ColumnDef> columns_ = columnDefs_.columns_;
-    std::vector<size_t> columnOffset_;
-    Segment* segmentPtr;
-};
-
 class Row {
 public:
-    Row(ColumnDefs columnDefs)
-        : columnDefs_(columnDefs), values_(columnDefs.getColumnCount()) {}
+    Row(ColumnDefs columnDefs) {
+        columnDefs_ = columnDefs;
+    }
 
     // template <typename T>
     // // T getColumnValue(int columnIndex) const {
@@ -155,8 +120,9 @@ public:
     //encode the Row into the buffer
     char* encodeRow() {
         ColumnDefs colDefs = getColumnDefs();
-        char* buffer_ = new char[colDefs.getRowSize()];
         int offset = 0;
+        char* buffer_ = new char[colDefs.getRowSize()];
+
         for (int i = 0; i < getColumnDefs().getRowSize(); i++) {
             buffer_[offset + i] = 0;
         }
@@ -301,7 +267,7 @@ public:
 
 private:
     ColumnDefs columnDefs_;
-    std::vector<std::string> values_;
+    std::vector<std::string> values_(columnDefs_.getColumnCount());
     char* data;
     int dataSize;
 
@@ -339,4 +305,39 @@ std::vector<uint8_t> encodeString(const std::string& value) {
 
 
 
+class Table {
+public:
+    Table(ColumnDefs columnDefs) {
+        columnDefs_ = columnDefs;
+    }
+
+    ColumnDefs& getColumnDefs() {
+        return columnDefs_;
+    }
+
+    std::string& getName() {
+        return name_;
+    }
+
+    std::vector<ColumnDef> getColumns() {
+        return columnDefs_.getColumn();
+    }
+
+    Segment* createSegment() {
+        if (segmentPtr != nullptr) {
+            return nullptr;
+        }
+        else {
+            segmentPtr = new Segment();
+            return segmentPtr;
+        }
+    }
+
+private:
+    std::string name_;
+    ColumnDefs columnDefs_;
+    std::vector<ColumnDef> columns_ = columnDefs_.columns_;
+    std::vector<size_t> columnOffset_;
+    Segment* segmentPtr;
+};
 
