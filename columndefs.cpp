@@ -79,7 +79,8 @@ public:
 
 class Row {
 public:
-    Row(ColumnDefs columnDefs) {
+    Row(ColumnDefs columnDefs)
+        : values_(columnDefs.getColumnCount()) {
         columnDefs_ = columnDefs;
     }
 
@@ -121,8 +122,6 @@ public:
     char* encodeRow() {
         ColumnDefs colDefs = getColumnDefs();
         int offset = 0;
-        char* buffer_ = new char[colDefs.getRowSize()];
-
         for (int i = 0; i < getColumnDefs().getRowSize(); i++) {
             buffer_[offset + i] = 0;
         }
@@ -149,10 +148,7 @@ public:
                     buffer_[offset + j] = encodedValue[j];
                 }
                 offset += colDefs.getColumnDef(i).getWidth();
-            }
-            
-
-            
+            }   
         }
         return buffer_;
     }
@@ -161,7 +157,6 @@ public:
     char* encode(std::string columnName, std::string fieldValue) {
         ColumnDefs colDefs = getColumnDefs();
         int offset = 0;
-        char* buffer_ = new char[colDefs.getRowSize()];
         for (int i = 0; i < colDefs.getColumnCount(); i++) {
             if (colDefs.getColumnDef(i).getName() == columnName) {
                 if (colDefs.getColumnDef(i).getType() == "int") {
@@ -267,9 +262,10 @@ public:
 
 private:
     ColumnDefs columnDefs_;
-    std::vector<std::string> values_(columnDefs_.getColumnCount());
+    std::vector<std::string> values_;
     char* data;
     int dataSize;
+    char* buffer_ = new char[columnDefs_.getRowSize()];
 
     // Encode an integer value to a byte array
 std::vector<uint8_t> encodeInt(int value) {
