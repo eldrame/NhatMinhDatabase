@@ -11,7 +11,11 @@
 class ColumnDef {
 public:
     ColumnDef(const std::string& name, const std::string& type, const int width)
-        : name_(name), type_(type), width_(width) {}
+        {
+            name_ = name;
+            type_ = type;
+            width_ = width;
+        }
 
     std::string& getName() {
         return name_;
@@ -112,7 +116,7 @@ private:
 class Row {
 public:
     Row(ColumnDefs columnDefs)
-        : columnDefs_(columnDefs), buffer_(columnDefs.getRowSize()), values_(columnDefs.getColumnCount()) {}
+        : columnDefs_(columnDefs), values_(columnDefs.getColumnCount()) {}
 
     // template <typename T>
     // // T getColumnValue(int columnIndex) const {
@@ -149,8 +153,9 @@ public:
     }
 
     //encode the Row into the buffer
-    std::vector<uint8_t> encodeRow() {
+    char* encodeRow() {
         ColumnDefs colDefs = getColumnDefs();
+        char* buffer_ = new char[colDefs.getRowSize()];
         int offset = 0;
         for (int i = 0; i < getColumnDefs().getRowSize(); i++) {
             buffer_[offset + i] = 0;
@@ -187,9 +192,10 @@ public:
     }
 
     //encode from field value in Row to a byte array
-    std::vector<uint8_t> encode(std::string columnName, std::string fieldValue) {
+    char* encode(std::string columnName, std::string fieldValue) {
         ColumnDefs colDefs = getColumnDefs();
         int offset = 0;
+        char* buffer_ = new char[colDefs.getRowSize()];
         for (int i = 0; i < colDefs.getColumnCount(); i++) {
             if (colDefs.getColumnDef(i).getName() == columnName) {
                 if (colDefs.getColumnDef(i).getType() == "int") {
@@ -276,7 +282,7 @@ public:
     }
 
     // get a value of a field from a row
-    template <typename T>
+    /*template <typename T>
     T getFieldValue(const std::string& fieldName) {
         for (size_t i = 0; i < columnDefs_.getColumnCount(); i++) {
             ColumnDef& columnDef = columnDefs_.getColumnDef(i);
@@ -289,7 +295,7 @@ public:
         throw std::runtime_error("Field" + fieldName + "not found in row");
     }
 
-    //pass the buffer to Segment
+    //pass the buffer to Segment*/
     
 
 
@@ -298,7 +304,6 @@ private:
     std::vector<std::string> values_;
     char* data;
     int dataSize;
-    std::vector<uint8_t> buffer_;
 
     // Encode an integer value to a byte array
 std::vector<uint8_t> encodeInt(int value) {
