@@ -238,25 +238,25 @@ public:
 
     // set a value to a field inside a row
     template <typename T>
-    void setFieldValue(const std::string& fieldName, std::string fieldValue) {
+    void setFieldValue(std::string& fieldName, std::string fieldValue) {
         encode(fieldName, fieldValue);
     }
 
     // get a value of a field from a row
-    /*template <typename T>
-    T getFieldValue(const std::string& fieldName) {
+    template <typename T>
+    T getFieldValue(std::string& fieldName) {
         for (size_t i = 0; i < columnDefs_.getColumnCount(); i++) {
             ColumnDef& columnDef = columnDefs_.getColumnDef(i);
             if (columnDef.getName() == fieldName) {
                 int offset = static_cast<int>(columnDef.getWidth());
-                const uint8_t* bufferPtr = &buffer_[offset];
+                char* bufferPtr = &buffer_[offset];
                 return decode<T>(bufferPtr, columnDef.getType());
             }
         }
         throw std::runtime_error("Field" + fieldName + "not found in row");
     }
 
-    //pass the buffer to Segment*/
+    //pass the buffer to Segment
     
 
 
@@ -319,6 +319,17 @@ public:
         return columnDefs_.getColumn();
     }
 
+    Row createRow() {}
+
+    void setRow() {}
+
+    Row getRow(int index) {
+        if (index < 0 || index >= rowList_.size()) {
+            throw std::out_of_range("Index out of range");
+        }
+        return rowList_[i];
+    }
+
     Segment* createSegment() {
         if (segmentPtr != nullptr) {
             return nullptr;
@@ -334,6 +345,7 @@ private:
     ColumnDefs columnDefs_;
     std::vector<ColumnDef> columns_ = columnDefs_.columns_;
     std::vector<size_t> columnOffset_;
+    std::vector<Row> rowList_;
     Segment* segmentPtr;
 };
 

@@ -84,32 +84,33 @@ protected:
 };
 
 TEST_F(RowTest, TestencodeRow) {
-    EXPECT_EQ(row_->encodeRow()[0], '\a');
-    EXPECT_EQ(row_->encodeRow()[1], '\0');
-    EXPECT_EQ(row_->encodeRow()[2], '\0');
-    EXPECT_EQ(row_->encodeRow()[3], '\0');
-    EXPECT_EQ(row_->encodeRow()[4], 'P');
-    EXPECT_EQ(row_->encodeRow()[5], 'h');
-    EXPECT_EQ(row_->encodeRow()[6], 'a');
-    EXPECT_EQ(row_->encodeRow()[7], 'n');
-    EXPECT_EQ(row_->encodeRow()[8], ' ');
-    EXPECT_EQ(row_->encodeRow()[9], 'N');
-    EXPECT_EQ(row_->encodeRow()[10], 'h');
-    EXPECT_EQ(row_->encodeRow()[11], 'a');
-    EXPECT_EQ(row_->encodeRow()[12], 't');
-    EXPECT_EQ(row_->encodeRow()[13], ' ');
-    EXPECT_EQ(row_->encodeRow()[14], 'M');
-    EXPECT_EQ(row_->encodeRow()[15], 'i');
-    EXPECT_EQ(row_->encodeRow()[16], 'n');
-    EXPECT_EQ(row_->encodeRow()[17], 'h');
-    EXPECT_EQ(row_->encodeRow()[18], '\0');
-    EXPECT_EQ(row_->encodeRow()[19], '\0');
-    EXPECT_EQ(row_->encodeRow()[20], '\0');
-    EXPECT_EQ(row_->encodeRow()[33], '\0');
-    EXPECT_EQ(row_->encodeRow()[34], '\x12');
-    EXPECT_EQ(row_->encodeRow()[35], '\0');
-    EXPECT_EQ(row_->encodeRow()[36], '\0');
-    EXPECT_EQ(row_->encodeRow()[37], '\0');
+    char* buffer = row_->encodeRow();
+    EXPECT_EQ(buffer[0], '\a');
+    EXPECT_EQ(buffer[1], '\0');
+    EXPECT_EQ(buffer[2], '\0');
+    EXPECT_EQ(buffer[3], '\0');
+    EXPECT_EQ(buffer[4], 'P');
+    EXPECT_EQ(buffer[5], 'h');
+    EXPECT_EQ(buffer[6], 'a');
+    EXPECT_EQ(buffer[7], 'n');
+    EXPECT_EQ(buffer[8], ' ');
+    EXPECT_EQ(buffer[9], 'N');
+    EXPECT_EQ(buffer[10], 'h');
+    EXPECT_EQ(buffer[11], 'a');
+    EXPECT_EQ(buffer[12], 't');
+    EXPECT_EQ(buffer[13], ' ');
+    EXPECT_EQ(buffer[14], 'M');
+    EXPECT_EQ(buffer[15], 'i');
+    EXPECT_EQ(buffer[16], 'n');
+    EXPECT_EQ(buffer[17], 'h');
+    EXPECT_EQ(buffer[18], '\0');
+    EXPECT_EQ(buffer[19], '\0');
+    EXPECT_EQ(buffer[20], '\0');
+    EXPECT_EQ(buffer[33], '\0');
+    EXPECT_EQ(buffer[34], '\x12');
+    EXPECT_EQ(buffer[35], '\0');
+    EXPECT_EQ(buffer[36], '\0');
+    EXPECT_EQ(buffer[37], '\0');
 }
 
 
