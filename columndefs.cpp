@@ -327,7 +327,7 @@ public:
         if (index < 0 || index >= rowList_.size()) {
             throw std::out_of_range("Index out of range");
         }
-        return rowList_[i];
+        return rowList_[index];
     }
 
     Segment* createSegment() {
