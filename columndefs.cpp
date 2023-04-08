@@ -305,9 +305,7 @@ public:
         columnDefs_ = columnDefs;
     }
 
-    // int getId() {
-    //     return id_;
-    // }
+    string name_;
 
     ColumnDefs getColumnDefs() {
         return columnDefs_;
@@ -343,7 +341,7 @@ public:
         if (row.getColumnDefs().getColumn() == columnDefs_.getColumn()) {
             rowList_.push_back(row);
         }
-        throw runtime_error("Row has different column definitions than the table.");
+        throw std::runtime_error("Row has different column definitions than the table.");
     }
 
     Segment* createSegment() {
@@ -357,8 +355,6 @@ public:
     }
 
 private:
-    // int id_; // id cua table, row cx can id dung ko
-    // string name_; // cho tam name vao private
     ColumnDefs columnDefs_;
     vector<ColumnDef> columns_ = columnDefs_.columns_;
     vector<size_t> columnOffset_;
