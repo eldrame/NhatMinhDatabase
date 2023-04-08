@@ -5,7 +5,6 @@
 #include <cstring>
 #include <stdio.h>
 #include "storageEngine.cpp"
-
 using namespace std;
 
 
@@ -61,11 +60,11 @@ public:
         return columns_.size();
     }
 
-    ColumnDef& getColumnDef(int i) {
-        if (i < 0 || i >= columns_.size()) {
+    ColumnDef& getColumnDef(int index) {
+        if (index < 0 || index >= columns_.size()) {
             throw out_of_range("Column index out of range");
         }
-        return columns_[i];
+        return columns_[index];
     }
 
     size_t getRowSize() {
@@ -300,7 +299,42 @@ vector<uint8_t> encodeString(const string& value) {
 }
 };
 
+class Database {
+public:
+    map<int, Table> Tables_;
 
+    void addTable(Table table) {
+        int last_index = Tables.rbegin()->first;
+        Tables_.insert({last_index + 1, table});
+    }
+
+    Table getTable(int index) {
+        return Tables_[index];
+    }
+
+    int getTableCount() {
+        return Tables_.size();
+    }
+
+    void eraseTable(int index) {
+        Tables_.erase(index);
+    }
+
+    void eraseTable_in_range(int l, int r) {
+        map<int, Table>::iterator itl, itr;
+        itl = Tables_.find(l);
+        itr = Tables_.find(r);
+        Tables_.erase(itl, itr);
+    }   
+
+    void clearTable() {
+        Tables_.clear();
+    }
+
+    void joinTable(Table table1, Table table2) {
+        // can primary key va forein key 
+    }
+};
 
 
 class Table {
@@ -309,7 +343,9 @@ public:
         columnDefs_ = columnDefs;
     }
 
-    string name_;
+    int getId() {
+        return id_;
+    }
 
     ColumnDefs getColumnDefs() {
         return columnDefs_;
@@ -358,6 +394,8 @@ public:
     }
 
 private:
+    int id_; // id cua table, row cx can id dung ko
+    string name_; // cho tam name vao private
     ColumnDefs columnDefs_;
     vector<ColumnDef> columns_ = columnDefs_.columns_;
     vector<size_t> columnOffset_;
