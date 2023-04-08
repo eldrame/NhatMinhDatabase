@@ -91,13 +91,8 @@ public:
 
 class Database {
 public:
-    Database() {}
-
-    Table createTable(string table_name) {
-        ColumnDefs colDefs;
-        Table table = new Table(colDefs);
-        return table;
-    }
+    map<string, Table> TableNames_;
+    map<int, Table> Tables_;
 
     void addTable(Table table, string table_name) {
         int last_index = Tables_.rbegin()->first;
@@ -129,34 +124,6 @@ public:
      void joinTable(Table table1, Table table2) {
          // can primary key va forein key 
      }
-
-    private:
-        map<string, Table> TableNames_;
-        map<int, Table> Tables_;
-
-        ColumnDefs columnDefsTables;
-        ColumnDefs columnDefsColumns;
-        columnDefsTables.addColumn(ColumnDef("TableId", "int", sizeof(int)));
-        columnDefsTables.addColumn(ColumnDef("table name", "string", 30));
-        columnDefsColumns.addColumn(ColumnDef("ColumnId", "int", sizeof(int)));
-        columnDefsColumns.addColumn(ColumnDef("column name", "string", 30));
-        columnDefsColumns.addColumn(ColumnDef("column type", "string", 30));
-        Table sys_Tables;
-        Table sys_Columns;
-        Row* row_1 = sys_Tables.createRow({"0", "sys_Tables"});
-        Row* row_2 sys_Tables.createRow({"1", "sys_Columns"});
-        Row* row_3 sys_Columns.createRow({"0", "TableId", "int"});
-        Row* row_4 sys_Columns.createRow({"1", "table name", "string"});
-        Row* row_5 sys_Columns.createRow({"2", "ColumnId", "string"});
-        Row* row_6 sys_Columns.createRow({"3", "column name", "string"});
-        Row* row_7 sys_Columns.createRow({"4", "column type", "string"});
-        sys_Tables.addRow(row_1);
-        sys_Tables.addRow(row_2);
-        sys_Columns.addRow(row_3);
-        sys_Columns.addRow(row_4);
-        sys_Columns.addRow(row_5);
-        sys_Columns.addRow(row_6);
-        sys_Columns.addRow(row_7);
 };
 
 int main() {
@@ -165,6 +132,7 @@ int main() {
 }
 
 
- 
+
+class StorageEngine {}; 
 
 

@@ -36,3 +36,5 @@ private:
     std::vector<uint8_t> dataFromExtent_;
     int segmentSize;
 };
+
+class StorageEngine {};
