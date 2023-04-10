@@ -301,33 +301,34 @@ vector<uint8_t> encodeString(const string& value) {
 
 class Database {
 public:
-    map<int, Table> Tables_;
+    map<string, Table> Tables_;
 
-    void addTable(Table table) {
-        int last_index = Tables.rbegin()->first;
-        Tables_.insert({last_index + 1, table});
+    void addTable(string name, Table table) {
+        if (!Tables_.count(name)) Tables_.insert({name, table});
+        throw invalid_argument("Table name must be unique");
     }
 
-    Table getTable(int index) {
-        return Tables_[index];
+    Table getTable(string name) {
+        return Tables_[name];
     }
 
     int getTableCount() {
         return Tables_.size();
     }
 
-    void eraseTable(int index) {
-        Tables_.erase(index);
+    void eraseTable(string name) {
+        if (Tables_count(name)) Tables_.erase(name);
+        throw invalid_argument("Table name does not exist");
     }
 
-    void eraseTable_in_range(int l, int r) {
-        map<int, Table>::iterator itl, itr;
-        itl = Tables_.find(l);
-        itr = Tables_.find(r);
-        Tables_.erase(itl, itr);
-    }   
+    // void eraseTable_in_range(int l, int r) {
+    //     map<int, Table>::iterator itl, itr;
+    //     itl = Tables_.find(l);
+    //     itr = Tables_.find(r);
+    //     Tables_.erase(itl, itr);
+    // }   
 
-    void clearTable() {
+    void clearallTable() {
         Tables_.clear();
     }
 
@@ -343,17 +344,17 @@ public:
         columnDefs_ = columnDefs;
     }
 
-    int getId() {
-        return id_;
-    }
+    // int getId() {
+    //     return id_;
+    // }
 
     ColumnDefs getColumnDefs() {
         return columnDefs_;
     }
 
-    string getName() {
-        return name_;
-    }
+    // string getName() {
+    //     return name_;
+    // }
 
     ColumnDefs getColumnDefsOfTable() {
         return columnDefs_;
@@ -380,7 +381,7 @@ public:
         if (row.getColumnDefs().getColumn() == columnDefs_.getColumn()) {
             rowList_.push_back(row);
         }
-        throw std::runtime_error("Row has different column definitions than the table.");
+        throw runtime_error("Row has different column definitions than the table.");
     }
 
     Segment* createSegment() {
@@ -394,8 +395,8 @@ public:
     }
 
 private:
-    int id_; // id cua table, row cx can id dung ko
-    string name_; // cho tam name vao private
+    // int id_; // id cua table, row cx can id dung ko
+    // string name_; // cho tam name vao private
     ColumnDefs columnDefs_;
     vector<ColumnDef> columns_ = columnDefs_.columns_;
     vector<size_t> columnOffset_;
