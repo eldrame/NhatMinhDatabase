@@ -24,6 +24,7 @@ public:
 
     int computeOffset(int index, std::vector<uint8_t> buffer_) {
         int offset = index * buffer_.size();
+        return offset;
     }
 
     std::vector<uint8_t> getByteBuffer() {

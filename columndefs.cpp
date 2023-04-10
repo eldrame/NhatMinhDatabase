@@ -299,45 +299,6 @@ vector<uint8_t> encodeString(const string& value) {
 }
 };
 
-class Database {
-public:
-    map<string, Table> Tables_;
-
-    void addTable(string name, Table table) {
-        if (!Tables_.count(name)) Tables_.insert({name, table});
-        throw invalid_argument("Table name must be unique");
-    }
-
-    Table getTable(string name) {
-        return Tables_[name];
-    }
-
-    int getTableCount() {
-        return Tables_.size();
-    }
-
-    void eraseTable(string name) {
-        if (Tables_count(name)) Tables_.erase(name);
-        throw invalid_argument("Table name does not exist");
-    }
-
-    // void eraseTable_in_range(int l, int r) {
-    //     map<int, Table>::iterator itl, itr;
-    //     itl = Tables_.find(l);
-    //     itr = Tables_.find(r);
-    //     Tables_.erase(itl, itr);
-    // }   
-
-    void clearallTable() {
-        Tables_.clear();
-    }
-
-    void joinTable(Table table1, Table table2) {
-        // can primary key va forein key 
-    }
-};
-
-
 class Table {
 public:
     Table(ColumnDefs columnDefs) {
@@ -365,7 +326,8 @@ public:
     }
 
     Row createRow() {
-        Row* row = new Row(columnDefs_);
+        Row *row = new Row(columnDefs_);
+        return *row; //sao lai la row ?
     }
 
     void setRow() {}
@@ -404,3 +366,40 @@ private:
     Segment* segmentPtr;
 };
 
+class Database {
+public:
+    map<string, Table> Tables_;
+
+    void addTable(string name, Table table) {
+        if (!Tables_.count(name)) Tables_.insert({name, table});
+        throw invalid_argument("Table name must be unique");
+    }
+
+    Table getTable(string name) {
+        return Tables_[name];
+    }
+
+    int getTableCount() {
+        return Tables_.size();
+    }
+
+    void eraseTable(string name) {
+        if (Tables_.count(name)) Tables_.erase(name);
+        throw invalid_argument("Table name does not exist");
+    }
+
+    // void eraseTable_in_range(int l, int r) {
+    //     map<int, Table>::iterator itl, itr;
+    //     itl = Tables_.find(l);
+    //     itr = Tables_.find(r);
+    //     Tables_.erase(itl, itr);
+    // }   
+
+    void clearallTable() {
+        Tables_.clear();
+    }
+
+    void joinTable(Table table1, Table table2) {
+        // can primary key va forein key 
+    }
+};
