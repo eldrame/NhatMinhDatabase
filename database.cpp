@@ -91,6 +91,9 @@ public:
 
 class Database {
 public:
+    Database() {
+
+    }
     map<string, Table> TableNames_;
     map<int, Table> Tables_;
 
@@ -124,7 +127,19 @@ public:
      void joinTable(Table table1, Table table2) {
          // can primary key va forein key 
      }
+
+    private:
+        ColumnDefs columnDefsTables;
+        ColumnDefs columnDefsColumns;
+        columnDefsTables.addColumn(ColumnDef("id", "int", sizeof(int)));
+        columnDefsTables.addColumn(ColumnDef("table name", "string", 30));
+        Table sys_Table = new Table(columnDefsTable);
 };
+
+int main() {
+    Database db = new Database();
+    return 0;
+}
 
 int main() {
     Database db = new Database();
