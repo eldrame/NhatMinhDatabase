@@ -14,7 +14,7 @@ class Extent {
 class Segment {
 public:
 
-    void Write(std::vector<uint8_t> newData) {
+    void Write(char* newData) {
         byteBuffer_ = newData;
     }
 
@@ -22,17 +22,17 @@ public:
         return dataFromExtent_;
     }
 
-    int computeOffset(int index, std::vector<uint8_t> buffer_) {
-        int offset = index * buffer_.size();
+    int computeOffset(int index, char* buffer_) {
+        int offset = index * sizeof(buffer_);
         return offset;
     }
 
-    std::vector<uint8_t> getByteBuffer() {
+    char* getByteBuffer() {
         return byteBuffer_;
     }
 
 private:
-    std::vector<uint8_t> byteBuffer_;
+    char* byteBuffer_;
     std::vector<uint8_t> dataFromExtent_;
     int segmentSize;
 };

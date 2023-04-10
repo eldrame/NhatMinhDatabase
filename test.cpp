@@ -30,10 +30,6 @@ protected:
     Table* table_;
 };
 
-TEST_F(TableTest, TestGetName) {
-    EXPECT_EQ(table_->getName(), "");
-}
-
 TEST_F(TableTest, TestGetColumnDefs) {
     ColumnDefs columnDefs = table_->getColumnDefs();
     EXPECT_EQ(columnDefs.getColumnCount(), 3);

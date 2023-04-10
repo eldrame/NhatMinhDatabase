@@ -305,17 +305,7 @@ public:
         columnDefs_ = columnDefs;
     }
 
-    string name_;
-
     ColumnDefs getColumnDefs() {
-        return columnDefs_;
-    }
-
-    // string getName() {
-    //     return name_;
-    // }
-
-    ColumnDefs getColumnDefsOfTable() {
         return columnDefs_;
     }
 
@@ -348,15 +338,22 @@ public:
         }
     }
 
+    void PassRowBufferToSegment(Row row) {
+        char* buffer = row.encodeRow();
+        DataSegment.Write(buffer);
+    }
+
 private:
     ColumnDefs columnDefs_;
     vector<ColumnDef> columns_ = columnDefs_.columns_;
     vector<size_t> columnOffset_;
     vector<Row> rowList_;
     Segment* segmentPtr;
+    Segment DataSegment;
+    Segment Index;
 };
 
-class Database {
+/*class Database {
 public:
     map<string, Table> Tables_;
 
@@ -392,4 +389,4 @@ public:
     void joinTable(Table table1, Table table2) {
         // can primary key va forein key 
     }
-};
+};*/
