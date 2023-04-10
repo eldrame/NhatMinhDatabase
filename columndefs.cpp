@@ -324,8 +324,7 @@ public:
     }
 
     Row createRow() {
-        Row *row = new Row(columnDefs_);
-        return *row; //sao lai la row ?
+        Row* row = new Row(columnDefs_);
     }
 
     void setRow() {}
@@ -337,12 +336,7 @@ public:
         return rowList_[index];
     }
 
-    void addRow(Row row) {
-        if (row.getColumnDefs().getColumn() == columnDefs_.getColumn()) {
-            rowList_.push_back(row);
-        }
-        throw std::runtime_error("Row has different column definitions than the table.");
-    }
+    void addRow(Row row) {}
 
     Segment* createSegment() {
         if (segmentPtr != nullptr) {
