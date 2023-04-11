@@ -91,80 +91,90 @@ public:
 
 class Database {
 public:
-    Database() {}
+    Database() {
+        //set up default sysTables:
+        columnDefsTables.addColumn(ColumnDef("TableId", "int", sizeof(int)));
+        columnDefsTables.addColumn(ColumnDef("table name", "string", 30));
+        columnDefsColumns.addColumn(ColumnDef("ColumnId", "int", sizeof(int)));
+        columnDefsColumns.addColumn(ColumnDef("column name", "string", 30));
+        columnDefsColumns.addColumn(ColumnDef("column type", "string", 30));
+
+        sys_Tables = new Table(columnDefsTables);
+        sys_Columns = new Table(columnDefsColumns);
+
+        Row* row_1 = sys_Tables -> createRow(columnDefsTables, {"0", "sys_Tables"});
+        Row* row_2 = sys_Tables -> createRow(columnDefsTables, {"1", "sys_Columns"});
+        Row* row_3 = sys_Columns -> createRow(columnDefsColumns, {"0", "TableId", "int"});
+        Row* row_4 = sys_Columns -> createRow(columnDefsColumns, {"1", "table name", "string"});
+        Row* row_5 = sys_Columns -> createRow(columnDefsColumns, {"2", "ColumnId", "string"});
+        Row* row_6 = sys_Columns -> createRow(columnDefsColumns, {"3", "column name", "string"});
+        Row* row_7 = sys_Columns -> createRow(columnDefsColumns, {"4", "column type", "string"});
+
+        sys_Tables -> addRow(row_1);//
+        sys_Tables -> addRow(row_2);
+        sys_Columns -> addRow(row_3);
+        sys_Columns -> addRow(row_4);
+        sys_Columns -> addRow(row_5);
+        sys_Columns -> addRow(row_6);
+        sys_Columns -> addRow(row_7);
+    }
     
     map<string, Table> TableNames_;
     map<int, Table> Tables_;
 
-    void addTable(Table table, string table_name) {
-        int last_index = Tables_.rbegin()->first;
-        Tables_.insert({last_index + 1, table});
+    void addTableByName(Table table, string table_name) {
+        if (!TableNames_.count(table_name)) {
+            TableNames_.insert({table_name, table});
+        }
+        throw invalid_argument("Table name must be unique");
     }
 
-    Table getTable(int index) {
-        if (index < 0 || index > Tables_.rbegin()->first) {
+    Table getTableByName(string table_name) {
+        if (!TableNames_.count(table_name)) {
+            throw out_of_range("the hell?");
+        }
+        else {
+            return TableNames_[table_name];
+        }
+    }
+
+    void eraseTableByName(string table_name) {
+        if (!TableNames_.count(table_name)) {
             throw std::out_of_range("the hell?");
         }
         else {
-            return Tables_[index];
+            TableNames_.erase(table_name);
         }
     }
 
-    void eraseTable(int index) {
-        if (index < 0 || index > Tables_.rbegin()->first) {
-            throw std::out_of_range("the hell?");
-        }
-        else {
-            Tables_.erase(index);
-        }
-    }
-
-    void clearTable() {
-         Tables_.clear();
+    void clearTableByIndex() {
+         TableNames_.clear();
      }
 
      void joinTable(Table table1, Table table2) {
          // can primary key va forein key 
      }
 
+     Table* getSys_Tables() {
+        return sys_Tables;
+     }
+
+     Table* getSys_Columns() {
+        return sys_Columns;
+     }
+
     private:
         ColumnDefs columnDefsTables;
         ColumnDefs columnDefsColumns;
-        columnDefsTables.addColumn(ColumnDef("TableId", "int", sizeof(int)));
-        columnDefsTables.addColumn(ColumnDef("table name", "string", 30));
-        columnDefsColumns.addColumn(ColumnDef("ColumnId", "int", sizeof(int)));
-        columnDefsColumns.addColumn(ColumnDef("column name", "string", 30));
-        columnDefsColumns.addColumn(ColumnDef("column type", "string", 30));
-        Table sys_Tables;
-        Table sys_Columns;
-        Row* row_1 = sys_Tables.createRow({"0", "sys_Tables"});
-        Row* row_2 sys_Tables.createRow({"1", "sys_Columns"});
-        Row* row_3 sys_Columns.createRow({"0", "TableId", "int"});
-        Row* row_4 sys_Columns.createRow({"1", "table name", "string"});
-        Row* row_5 sys_Columns.createRow({"2", "ColumnId", "string"});
-        Row* row_6 sys_Columns.createRow({"3", "column name", "string"});
-        Row* row_7 sys_Columns.createRow({"4", "column type", "string"});
-        sys_Tables.addRow(row_1);
-        sys_Tables.addRow(row_2);
-        sys_Columns.addRow(row_3);
-        sys_Columns.addRow(row_4);
-        sys_Columns.addRow(row_5);
-        sys_Columns.addRow(row_6);
-        sys_Columns.addRow(row_7);
-};
+        Table* sys_Tables;
+        Table* sys_Columns;
+    };
 
 int main() {
-    Database db = new Database();
-    return 0;
+    Database* db = new Database();
+    db -> getSys_Tables();
 }
 
-int main() {
-    Database db = new Database();
-    return 0;
-}
-
-
-
-class StorageEngine {}; 
+ 
 
 

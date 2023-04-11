@@ -35,6 +35,16 @@ public:
         }
         if (getType() == "string") {
             return 30;
+        };
+        return 0;
+    }
+
+    bool isDifferentColumnDef(ColumnDef other) {
+        if (name_ != other.getName() && type_ != other.getType()) {
+            return true;
+        }
+        else {
+            return false;
         }
     }
 
@@ -60,7 +70,7 @@ public:
         return columns_.size();
     }
 
-    ColumnDef& getColumnDef(int index) {
+    ColumnDef getColumnDef(int index) {
         if (index < 0 || index >= columns_.size()) {
             throw out_of_range("Column index out of range");
         }
@@ -74,6 +84,21 @@ public:
                 rowSize_ += columnDef.getWidth();
             }
         return rowSize_;
+    }
+
+    bool columnDefsIsEqual(ColumnDefs colDefs) {
+        if (colDefs.getColumn().size() != getColumn().size()) {
+            return false;
+        }
+        for (int i = 0; i < colDefs.getColumn().size(); i++) {
+            if (getColumnDef(i).isDifferentColumnDef(colDefs.getColumnDef(i)) == true) {
+                break;
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
     }
 };
 
@@ -124,14 +149,14 @@ public:
         ColumnDefs colDefs = getColumnDefs();
         int offset = 0;
         for (int i = 0; i < getColumnDefs().getRowSize(); i++) {
-            buffer_[offset + i] = 0;
+            rowBuffer_[offset + i] = 0;
         }
         for (int i = 0; i < colDefs.getColumnCount(); i++) {
             if (colDefs.getColumnDef(i).getType() == "int") {
                 int value = stoi(values_[i]);
                 vector<uint8_t> encodedValue = encodeInt((int) value);
                 for (int j = 0; j < sizeof(int); j++) {
-                    buffer_[offset + j] = encodedValue[j];
+                    rowBuffer_[offset + j] = encodedValue[j];
                 }
                 offset += colDefs.getColumnDef(i).getWidth();
             }
@@ -139,19 +164,19 @@ public:
                 double value = stod(values_[i]);
                 vector<uint8_t> encodedValue = encodeDouble((double) value);
                 for (int j = 0; j < sizeof(double); j++) {
-                    buffer_[offset + j] = encodedValue[j];
+                    rowBuffer_[offset + j] = encodedValue[j];
                 }
                 offset += colDefs.getColumnDef(i).getWidth();
             }
             if (colDefs.getColumnDef(i).getType() == "string") {
                 vector<uint8_t> encodedValue = encodeString((string) values_[i]);
                 for (int j = 0; j < encodedValue.size() + 1; j++) {
-                    buffer_[offset + j] = encodedValue[j];
+                    rowBuffer_[offset + j] = encodedValue[j];
                 }
                 offset += colDefs.getColumnDef(i).getWidth();
             }   
         }
-        return buffer_;
+        return rowBuffer_;
     }
 
     //encode from field value in Row to a byte array
@@ -164,27 +189,27 @@ public:
                     int value = stoi(fieldValue);
                     vector<uint8_t> encodedValue = encodeInt(value);
                     for (int i = 0; i < sizeof(int); i++) {
-                        buffer_[offset + i] = encodedValue[i];
+                        rowBuffer_[offset + i] = encodedValue[i];
                     }
-                    return buffer_;
+                    return rowBuffer_;
                 }
                 if (colDefs.getColumnDef(i).getType() == "double") {
                     double value = stod(fieldValue);
                     vector<uint8_t> encodedValue = encodeDouble(value);
                     for (int i = 0; i < sizeof(double); i++) {
-                        buffer_[offset + i] = encodedValue[i];
+                        rowBuffer_[offset + i] = encodedValue[i];
                     }
-                    return buffer_;
+                    return rowBuffer_;
                 }
                 if (colDefs.getColumnDef(i).getType() == "string") {
                     vector<uint8_t> encodedValue = encodeString(fieldValue);
                     for (int t = 0; t < 30; t++) {
-                        buffer_[offset + t] = 0;
+                        rowBuffer_[offset + t] = 0;
                     }
                     for (int j = 0; j < fieldValue.size() + 1; j++) {
-                        buffer_[offset + j] = encodedValue[j];
+                        rowBuffer_[offset + j] = encodedValue[j];
                     }
-                    return buffer_;
+                    return rowBuffer_;
                 }
                 
             }
@@ -192,6 +217,7 @@ public:
                 offset += colDefs.getColumnDef(i).getWidth();
             }
         }
+        return 0;
     }
 
     //decode from byte array to field value in Row
@@ -247,10 +273,10 @@ public:
     template <typename T>
     T getFieldValue(string& fieldName) {
         for (size_t i = 0; i < columnDefs_.getColumnCount(); i++) {
-            ColumnDef& columnDef = columnDefs_.getColumnDef(i);
+            ColumnDef columnDef = columnDefs_.getColumnDef(i);
             if (columnDef.getName() == fieldName) {
                 int offset = static_cast<int>(columnDef.getWidth());
-                char* bufferPtr = &buffer_[offset];
+                char* bufferPtr = &rowBuffer_[offset];
                 return decode<T>(bufferPtr, columnDef.getType());
             }
         }
@@ -266,10 +292,10 @@ private:
     vector<string> values_;
     char* data;
     int dataSize;
-    char* buffer_ = new char[columnDefs_.getRowSize()];
-
+    char* rowBuffer_ = new char[columnDefs_.getRowSize()];
+    
     // Encode an integer value to a byte array
-vector<uint8_t> encodeInt(int value) {
+    vector<uint8_t> encodeInt(int value) {
     vector<uint8_t> buffer(sizeof(int));
     int offset = 0;
     uint8_t* ptr = reinterpret_cast<uint8_t*>(&value);
@@ -301,6 +327,9 @@ vector<uint8_t> encodeString(const string& value) {
 
 class Table {
 public:
+    Table()
+    {}
+    
     Table(ColumnDefs columnDefs) {
         columnDefs_ = columnDefs;
     }
@@ -313,8 +342,10 @@ public:
         return columnDefs_.getColumn();
     }
 
-    Row createRow() {
+    Row* createRow(ColumnDefs columnDefs_, vector<string> rowValue) {
         Row* row = new Row(columnDefs_);
+        row -> SetValue(rowValue);
+        return row;
     }
 
     void setRow() {}
@@ -326,7 +357,15 @@ public:
         return rowList_[index];
     }
 
-    void addRow(Row row) {}
+    void addRow(Row* row) {
+        ColumnDefs row_columnDefs = row -> getColumnDefs();
+        if (columnDefs_.columnDefsIsEqual(row_columnDefs) == true) {
+            rowList_.push_back(*row);
+        }
+        else {
+            cout << "ColumnDefs is not match the Table" << endl;
+        }
+    }
 
     Segment* createSegment() {
         if (segmentPtr != nullptr) {
