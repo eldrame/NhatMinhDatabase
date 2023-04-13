@@ -294,8 +294,8 @@ private:
     int dataSize;
     char* rowBuffer_ = new char[columnDefs_.getRowSize()];
     
-    // Encode an integer value to a byte array
-    vector<uint8_t> encodeInt(int value) {
+// Encode an integer value to a byte array
+vector<uint8_t> encodeInt(int value) {
     vector<uint8_t> buffer(sizeof(int));
     int offset = 0;
     uint8_t* ptr = reinterpret_cast<uint8_t*>(&value);
@@ -303,7 +303,7 @@ private:
         buffer[offset + i] = *(ptr + i);
     }
     return buffer;
-}
+}                           
 
 // Encode a double value to a byte array
 vector<uint8_t> encodeDouble(double value) {
