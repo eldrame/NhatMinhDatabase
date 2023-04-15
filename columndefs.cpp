@@ -149,14 +149,14 @@ public:
         ColumnDefs colDefs = getColumnDefs();
         int offset = 0;
         for (int i = 0; i < getColumnDefs().getRowSize(); i++) {
-            rowBuffer_[offset + i] = 0;
+            buffer_[offset + i] = 0;
         }
         for (int i = 0; i < colDefs.getColumnCount(); i++) {
             if (colDefs.getColumnDef(i).getType() == "int") {
                 int value = stoi(values_[i]);
                 vector<uint8_t> encodedValue = encodeInt((int) value);
                 for (int j = 0; j < sizeof(int); j++) {
-                    rowBuffer_[offset + j] = encodedValue[j];
+                    buffer_[offset + j] = encodedValue[j];
                 }
                 offset += colDefs.getColumnDef(i).getWidth();
             }
@@ -164,19 +164,19 @@ public:
                 double value = stod(values_[i]);
                 vector<uint8_t> encodedValue = encodeDouble((double) value);
                 for (int j = 0; j < sizeof(double); j++) {
-                    rowBuffer_[offset + j] = encodedValue[j];
+                    buffer_[offset + j] = encodedValue[j];
                 }
                 offset += colDefs.getColumnDef(i).getWidth();
             }
             if (colDefs.getColumnDef(i).getType() == "string") {
                 vector<uint8_t> encodedValue = encodeString((string) values_[i]);
                 for (int j = 0; j < encodedValue.size() + 1; j++) {
-                    rowBuffer_[offset + j] = encodedValue[j];
+                    buffer_[offset + j] = encodedValue[j];
                 }
                 offset += colDefs.getColumnDef(i).getWidth();
             }   
         }
-        return rowBuffer_;
+        return buffer_;
     }
 
     //encode from field value in Row to a byte array
@@ -189,27 +189,27 @@ public:
                     int value = stoi(fieldValue);
                     vector<uint8_t> encodedValue = encodeInt(value);
                     for (int i = 0; i < sizeof(int); i++) {
-                        rowBuffer_[offset + i] = encodedValue[i];
+                        buffer_[offset + i] = encodedValue[i];
                     }
-                    return rowBuffer_;
+                    return buffer_;
                 }
                 if (colDefs.getColumnDef(i).getType() == "double") {
                     double value = stod(fieldValue);
                     vector<uint8_t> encodedValue = encodeDouble(value);
                     for (int i = 0; i < sizeof(double); i++) {
-                        rowBuffer_[offset + i] = encodedValue[i];
+                        buffer_[offset + i] = encodedValue[i];
                     }
-                    return rowBuffer_;
+                    return buffer_;
                 }
                 if (colDefs.getColumnDef(i).getType() == "string") {
                     vector<uint8_t> encodedValue = encodeString(fieldValue);
                     for (int t = 0; t < 30; t++) {
-                        rowBuffer_[offset + t] = 0;
+                        buffer_[offset + t] = 0;
                     }
                     for (int j = 0; j < fieldValue.size() + 1; j++) {
-                        rowBuffer_[offset + j] = encodedValue[j];
+                        buffer_[offset + j] = encodedValue[j];
                     }
-                    return rowBuffer_;
+                    return buffer_;
                 }
                 
             }
@@ -217,7 +217,7 @@ public:
                 offset += colDefs.getColumnDef(i).getWidth();
             }
         }
-        return 0;
+        return buffer_;
     }
 
     //decode from byte array to field value in Row
@@ -276,7 +276,7 @@ public:
             ColumnDef columnDef = columnDefs_.getColumnDef(i);
             if (columnDef.getName() == fieldName) {
                 int offset = static_cast<int>(columnDef.getWidth());
-                char* bufferPtr = &rowBuffer_[offset];
+                char* bufferPtr = &buffer_[offset];
                 return decode<T>(bufferPtr, columnDef.getType());
             }
         }
@@ -292,7 +292,7 @@ private:
     vector<string> values_;
     char* data;
     int dataSize;
-    char* rowBuffer_ = new char[columnDefs_.getRowSize()];
+    char* buffer_ = new char[columnDefs_.getRowSize()];
     
 // Encode an integer value to a byte array
 vector<uint8_t> encodeInt(int value) {
@@ -342,29 +342,27 @@ public:
         return columnDefs_.getColumn();
     }
 
-    Row* createRow(ColumnDefs columnDefs_, vector<string> rowValue) {
+    //create a row and push it to rowList_
+    void createRow(string rowName, vector<string> rowValue) {
         Row* row = new Row(columnDefs_);
         row -> SetValue(rowValue);
-        return row;
+        char* buffer = row -> encodeRow();
+        getDataSegment().writeRowBuffer(buffer);
+        rowList_.insert({rowName, static_cast<int>(rowList_.size() + 1)});
     }
 
-    void setRow() {}
+    //get Row from map rowList_ by row's name
+    Row* getRow(string rowName) {}
 
-    Row getRow(int index) {
-        if (index < 0 || index >= rowList_.size()) {
-            throw out_of_range("Index out of range");
-        }
-        return rowList_[index];
-    }
+    //read a buffer from the data segment:
+    char* readRowBuffer(string rowName) {}
 
-    void addRow(Row* row) {
-        ColumnDefs row_columnDefs = row -> getColumnDefs();
-        if (columnDefs_.columnDefsIsEqual(row_columnDefs) == true) {
-            rowList_.push_back(*row);
-        }
-        else {
-            cout << "ColumnDefs is not match the Table" << endl;
-        }
+    //write a row_buffer to the data segment:
+    void writeRowBuffer(int index, char* buffer) {}
+
+    //get the corresponding data segment
+    Segment getDataSegment() {
+        return DataSegment;
     }
 
     Segment* createSegment() {
@@ -377,16 +375,11 @@ public:
         }
     }
 
-    void PassRowBufferToSegment(Row row) {
-        char* buffer = row.encodeRow();
-        DataSegment.Write(buffer);
-    }
-
 private:
     ColumnDefs columnDefs_;
     vector<ColumnDef> columns_ = columnDefs_.columns_;
     vector<size_t> columnOffset_;
-    vector<Row> rowList_;
+    map<string, int> rowList_;
     Segment* segmentPtr;
     Segment DataSegment;
     Segment Index;

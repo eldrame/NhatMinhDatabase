@@ -14,8 +14,8 @@ class Extent {
 class Segment {
 public:
 
-    void Write(char* newData) {
-        byteBuffer_ = newData;
+    void writeRowBuffer(char* buffer) {
+        byteBuffer_ = buffer;
     }
 
     std::vector<uint8_t> Read() {

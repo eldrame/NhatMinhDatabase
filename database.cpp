@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <cstdlib>
 #include "columndefs.cpp"
+#include <filesystem>
+#include <dirent.h>
 
 using namespace std;
 
@@ -92,64 +94,36 @@ public:
 class Database {
 public:
     Database() {
-        //set up default sysTables:
-        columnDefsTables.addColumn(ColumnDef("TableId", "int", sizeof(int)));
-        columnDefsTables.addColumn(ColumnDef("table name", "string", 30));
-        columnDefsColumns.addColumn(ColumnDef("ColumnId", "int", sizeof(int)));
-        columnDefsColumns.addColumn(ColumnDef("column name", "string", 30));
-        columnDefsColumns.addColumn(ColumnDef("column type", "string", 30));
+       //Set up Default tables:
+        createSys_Tables();  
+        createSys_Columns(); 
+    }
 
-        sys_Tables = new Table(columnDefsTables);
-        sys_Columns = new Table(columnDefsColumns);
+    Database(const string name) {
+        //Set a name for the database
+        nameOfDatabase = name;
 
-        Row* row_1 = sys_Tables -> createRow(columnDefsTables, {"0", "sys_Tables"});
-        Row* row_2 = sys_Tables -> createRow(columnDefsTables, {"1", "sys_Columns"});
-        Row* row_3 = sys_Columns -> createRow(columnDefsColumns, {"0", "TableId", "int"});
-        Row* row_4 = sys_Columns -> createRow(columnDefsColumns, {"1", "table name", "string"});
-        Row* row_5 = sys_Columns -> createRow(columnDefsColumns, {"2", "ColumnId", "string"});
-        Row* row_6 = sys_Columns -> createRow(columnDefsColumns, {"3", "column name", "string"});
-        Row* row_7 = sys_Columns -> createRow(columnDefsColumns, {"4", "column type", "string"});
+        //Open a directory for the database:
+        database_dir = opendir(name.c_str());
 
-        sys_Tables -> addRow(row_1);//
-        sys_Tables -> addRow(row_2);
-        sys_Columns -> addRow(row_3);
-        sys_Columns -> addRow(row_4);
-        sys_Columns -> addRow(row_5);
-        sys_Columns -> addRow(row_6);
-        sys_Columns -> addRow(row_7);
+        //Check if the directory is opened successfully
+        if (!database_dir) {
+            cerr << "Failed to open database's directory" << name << endl;
+        }
+
+        //Set up Default tables:
+        createSys_Tables();  
+        createSys_Columns();
     }
     
     map<string, Table> TableNames_;
     map<int, Table> Tables_;
 
-    void addTableByName(Table table, string table_name) {
-        if (!TableNames_.count(table_name)) {
-            TableNames_.insert({table_name, table});
-        }
-        throw invalid_argument("Table name must be unique");
-    }
+    void createTableByName(string table_name) {}
 
-    Table getTableByName(string table_name) {
-        if (!TableNames_.count(table_name)) {
-            throw out_of_range("the hell?");
-        }
-        else {
-            return TableNames_[table_name];
-        }
-    }
+    Table getTableByName(string table_name) {}
 
-    void eraseTableByName(string table_name) {
-        if (!TableNames_.count(table_name)) {
-            throw std::out_of_range("the hell?");
-        }
-        else {
-            TableNames_.erase(table_name);
-        }
-    }
-
-    void clearTableByIndex() {
-         TableNames_.clear();
-     }
+    void eraseTableByName(string table_name) {}
 
      void joinTable(Table table1, Table table2) {
          // can primary key va forein key 
@@ -164,15 +138,71 @@ public:
      }
 
     private:
+        string nameOfDatabase;
+        DIR* database_dir;
         ColumnDefs columnDefsTables;
         ColumnDefs columnDefsColumns;
         Table* sys_Tables;
         Table* sys_Columns;
+
+        void createSys_Tables() {
+        //set up default sysTables:
+            columnDefsTables.addColumn(ColumnDef("TableId", "int", sizeof(int)));
+            columnDefsTables.addColumn(ColumnDef("table name", "string", 30));
+
+            sys_Tables = new Table(columnDefsTables);
+
+            sys_Tables -> createRow("sysTables", {"0", "sys_Tables"});
+            sys_Tables -> createRow("sysColumns", {"1", "sys_Columns"});
+        }
+
+        void createSys_Columns() {
+            columnDefsColumns.addColumn(ColumnDef("ColumnId", "int", sizeof(int)));
+            columnDefsColumns.addColumn(ColumnDef("column name", "string", 30));
+            columnDefsColumns.addColumn(ColumnDef("column type", "string", 30));
+
+            sys_Columns = new Table(columnDefsColumns);
+
+        
+            sys_Columns -> createRow("TableId", {"0", "TableId", "int"});
+            sys_Columns -> createRow("table name", {"1", "table name", "string"});
+            sys_Columns -> createRow("ColumnId", {"2", "ColumnId", "string"});
+            sys_Columns -> createRow("column name", {"3", "column name", "string"});
+            sys_Columns -> createRow("column type", {"4", "column type", "string"});
+    }
+
     };
 
+class DatabaseEngine {
+public:
+    DatabaseEngine() {}
+
+    ~DatabaseEngine() {
+        // Cleanup the database engine...
+    }
+    static DatabaseEngine& getInstance() {
+    static DatabaseEngine instance;
+    return instance;
+    }
+
+    Database createDatabase(string name) {
+        Database* db = new Database(name);
+        return *db;
+    }
+    Database* getDatabase(string name) {}
+
+private:
+    // Disable copy and move constructors
+    DatabaseEngine(const DatabaseEngine&) = delete;
+    DatabaseEngine& operator=(const DatabaseEngine&) = delete;
+    DatabaseEngine(DatabaseEngine&&) = delete;
+    DatabaseEngine& operator=(DatabaseEngine&&) = delete;
+};
+
 int main() {
-    Database* db = new Database();
-    db -> getSys_Tables();
+    DatabaseEngine db;
+    db.getInstance().createDatabase("MySchool").createTableByName("hocsinh");
+    db.getInstance().getDatabase("Myschool")->getTableByName("hocsinh").createRow("Phan Nhat Minh", {"Phan Nhat Minh", "01", "18"});
 }
 
  
