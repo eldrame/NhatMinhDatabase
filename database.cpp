@@ -119,7 +119,10 @@ public:
     map<string, Table> TableNames_;
     map<int, Table> Tables_;
 
-    void createTableByName(string table_name) {}
+    Table createTable(string table_name) {
+        Table* table = new Table();
+        return *table;
+    }
 
     Table getTableByName(string table_name) {}
 
@@ -189,7 +192,7 @@ public:
         Database* db = new Database(name);
         return *db;
     }
-    Database* getDatabase(string name) {}
+    Database getDatabase(string name) {}
 
 private:
     // Disable copy and move constructors
@@ -201,8 +204,7 @@ private:
 
 int main() {
     DatabaseEngine db;
-    db.getInstance().createDatabase("MySchool").createTableByName("hocsinh");
-    db.getInstance().getDatabase("Myschool")->getTableByName("hocsinh").createRow("Phan Nhat Minh", {"Phan Nhat Minh", "01", "18"});
+    db.getInstance().createDatabase("MySchool").createTable("hocsinh");
 }
 
  
